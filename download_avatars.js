@@ -4,7 +4,12 @@ var fs = require('fs');
 
 const myArgs = process.argv.splice(2);
 
+// Takes input from the command line (Github username, one of the user's public repo's) and downloads the contributors' avatars to a local directory)
+
 function getRepoContributors(repoOwner, repoName, cb) {
+
+  // Structure for command line input to direct to proper users object.
+  // Get headers to establish credentials and authorization to allow for repeted testing.
 
   var options = {
     url: "https://api.github.com/repos/" + repoOwner + "/" + repoName + "/contributors",
@@ -14,10 +19,14 @@ function getRepoContributors(repoOwner, repoName, cb) {
     }
   }
 
+  // Transforms plain text from HTTPS response into useable JS.
+
   function JSONParse(data) {
     var userInfo = JSON.parse(data);
     return userInfo;
   }
+
+  // HTTPS request to Github Server, feeds callback function with JSON parsed data.
 
   request(options, function(err, res, body) {
     if (err !== null) {
@@ -28,8 +37,10 @@ function getRepoContributors(repoOwner, repoName, cb) {
   });
 }
 
+// Uses the pulled arguments from CLI to download and write the images to local directory.
+
 getRepoContributors(myArgs[0], myArgs[1], function(err, result) {
-  if (myArgs.length <= 0) {
+  if (myArgs.length !== 2) {
     throw "To download avatars, owner and repo names are required.";
   } else if (err) {
     console.log("Errors: ", err);
@@ -41,6 +52,7 @@ getRepoContributors(myArgs[0], myArgs[1], function(err, result) {
   }
 });
 
+// Displays image information/status and designates which directory to save files to.
 
 function downloadImageByURL(url, filePath) {
   request.get(url)
@@ -49,7 +61,7 @@ function downloadImageByURL(url, filePath) {
     })
 
     .on('response', function (res) {
-      console.log('Image Info : StatCode: ' + res.statusCode + ', StatMessage' + res.statusMessage + ", ContentType: " + res.headers['content-type']);
+      console.log('Image Info : StatCode: ' + res.statusCode + ', StatMessage: ' + res.statusMessage + ", ContentType: " + res.headers['content-type']);
       console.log("Avatar download complete!")
     })
     .pipe(fs.createWriteStream(filePath))

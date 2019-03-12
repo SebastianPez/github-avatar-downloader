@@ -2,6 +2,7 @@ var request = require('request');
 var gitToken = require('./secrets').GITHUB_TOKEN;
 var fs = require('fs');
 
+const myArgs = process.argv.splice(2);
 
 function getRepoContributors(repoOwner, repoName, cb) {
 
@@ -24,13 +25,16 @@ function getRepoContributors(repoOwner, repoName, cb) {
   });
 }
 
-getRepoContributors("jquery", "jquery", function(err, result) {
-  if (err) {
+getRepoContributors(myArgs[0], myArgs[1], function(err, result) {
+  if (myArgs.length <= 0) {
+    throw "To download avatars, owner and repo names are required.";
+  } else if (err) {
     console.log("Errors: ", err);
     return err;
-  }
-  for (let user of result) {
-    downloadImageByURL(user.avatar_url, "./avatars/" + user.login + ".jpeg")
+  } else {
+    for (let user of result) {
+      downloadImageByURL(user.avatar_url, "./avatars/" + user.login + ".jpeg")
+    }
   }
 });
 

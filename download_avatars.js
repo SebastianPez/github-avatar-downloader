@@ -20,6 +20,9 @@ function getRepoContributors(repoOwner, repoName, cb) {
   }
 
   request(options, function(err, res, body) {
+    if (err !== null) {
+      console.log("Error is: ", err.statusCode);
+    }
     res.setEncoding('utf8');
     cb(err, JSONParse(body));
   });
